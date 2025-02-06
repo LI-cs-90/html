@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Photo Cube with Music and Sakura Background</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background: #000 url('sakura_bg.jpg') repeat top center;
+            animation: fall 10s linear infinite;
+        }
+
+        @keyframes fall {
+            from { background-position: 0 0; }
+            to { background-position: 0 100%; }
+        }
+
+        .scene {
+            width: 400px;
+            height: 400px;
+            perspective: 600px;
+        }
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-30deg) rotateY(45deg);
+            transition: transform 0.1s;
+        }
+        .face {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: #fff;
+            border: 2px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            color: white;
+        }
+        .face img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .front  { transform: rotateY(  0deg) translateZ(100px); }
+        .back   { transform: rotateY(180deg) translateZ(100px); }
+        .right  { transform: rotateY( 90deg) translateZ(100px); }
+        .left   { transform: rotateY(-90deg) translateZ(100px); }
+        .top    { transform: rotateX( 90deg) translateZ(100px); }
+        .bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+        .face::before {
+            content: "";
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: url('sakura.png') no-repeat center center / contain;
+            top: 10px;
+            left: 10px;
+        }
+
+        #play-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="cube">
+            <div class="face front"><img src="photo1.jpg" alt="Photo 1"></div>
+            <div class="face back"><img src="photo2.jpg" alt="Photo 2"></div>
+            <div class="face right"><img src="photo3.jpg" alt="Photo 3"></div>
+            <div class="face left"><img src="photo4.jpg" alt="Photo 4"></div>
+            <div class="face top"><img src="photo5.jpg" alt="Photo 5"></div>
+            <div class="face bottom"><img src="photo6.jpg" alt="Photo 6"></div>
+        </div>
+    </div>
+
+    <button id="play-button">Play Music</button>
+    <audio id="background-music" src="music.mp3" loop></audio>
+
+    <script>
+        const playButton = document.getElementById('play-button');
+        const audio = document.getElementById('background-music');
+        const cube = document.querySelector('.cube');
+        let mouseX = 0, mouseY = 0;
+        let rotationX = -30, rotationY = 45;
+        let autoRotate = true;
+
+        playButton.addEventListener('click', () => {
+            audio.play().catch(error => {
+                console.log('Playback was prevented:', error);
+            });
+            playButton.style.display = 'none';
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            autoRotate = false;
+            mouseX = event.clientX / window.innerWidth - 0.5;
+            mouseY = event.clientY / window.innerHeight - 0.5;
+            rotationX = mouseY * -90;
+            rotationY = mouseX * 90;
+            cube.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+        });
+
+        document.addEventListener('mouseout', () => {
+            autoRotate = true;
+        });
+
+        function animate() {
+            if (autoRotate) {
+                rotationY += 0.1;
+                cube.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
